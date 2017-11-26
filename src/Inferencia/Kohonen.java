@@ -1,35 +1,21 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Inferencia;
-
-/**
- *
- * @author danie
- */
 public class Kohonen {
-    public static void main(String[] args) {
-        
-         Double[][] Entradas = {         {1.0,1.0,0.0,1.0,0.0,0.0,0.0},
-                                         {1.0,1.0,1.0,0.0,0.0,0.0,0.0},//0 //0 //1
-                                         {1.0,0.0,0.0,0.0,0.0,1.0,0.0},
-                                         {0.0,0.0,1.0,1.0,1.0,0.0,0.0},
-                                         {0.0,0.0,1.0,0.0,0.0,0.0,1.0},
-                                         {0.0,0.0,0.0,0.0,0.0,0.0,0.0}
-                                         
-                                         };
-    Double t=1.0;
-    Double[][] Pesos = {              {0.4,0.4,0.5,0.4,0.7,0.5,0.5},
-                                      {0.4,0.5,0.6,0.4,0.5,0.6,0.5},
-                                      {0.5,0.6,0.5,0.4,0.8,0.3,0.5},
-                                      {0.5,0.6,0.5,0.4,0.7,0.3,0.5},
-                                      {0.5,0.6,0.1,0.1,0.5,0.4,0.5},
-                                      {0.5,0.1,0.2,0.1,0.4,0.5,0.5},
-                                      
-                                     };
-    Double[] Deltas = new Double[Pesos.length];
+    
+    double t = 1.0;
+    public double[][] pesos;
+    double[][] entradas;
+    double[] deltas; 
+    int clases;
+    public Kohonen(double[][] Pesos, double[][] Entradas)
+    {
+        this.pesos = Pesos;
+        this.entradas = Entradas;
+        clases = Entradas.length;
+        deltas = new double[Pesos.length];
+    }
+    public void Entrenamiento()
+    {
+    
     int neurona_ganadora=0;
     double aux_neurona;
         for (int tt = 1;tt <= 50000; tt++) 
@@ -39,39 +25,41 @@ public class Kohonen {
         neurona_ganadora=-1;
         
         //Generacion de Epoca
-        for (int i = 0; i < Entradas.length; i++) 
+        for (int i = 0; i < entradas.length; i++) 
         {
-            for (int j = 0; j < Pesos.length; j++) {
-                Deltas[j]=0.0;
+            for (int j = 0; j < pesos.length; j++) {
+                deltas[j]=0.0;
             }
             //Calculo de Deltas
-            for (int j = 0; j < Pesos.length; j++) 
+            for (int j = 0; j < pesos.length; j++) 
             {
-                for (int k = 0; k < Entradas[i].length; k++) 
+                for (int k = 0; k < entradas[i].length; k++) 
                 {
-                    Deltas[j]+= Math.pow(Entradas[i][k]-Pesos[j][k],2);
+                    deltas[j]+= Math.pow(entradas[i][k]-pesos[j][k],2);
                     
                 }
                 //System.out.print(String.format("%.2f",Deltas[j])+"\t");
                 if(j==0)
                 {
                     //Se obtiene la neurona vencedora
-                    aux_neurona=Deltas[j];
+                    aux_neurona=deltas[j];
                     neurona_ganadora=j;
                 }
-                else if(aux_neurona>Deltas[j])
+                else if(aux_neurona>deltas[j])
                 {
                     //Se obtiene la neurona vencedora
-                    aux_neurona=Deltas[j];
+                    aux_neurona=deltas[j];
                     neurona_ganadora=j;
                 }
                 
             }
-            for (int j = 0; j < Entradas[0].length; j++) {
+            for (int j = 0; j < entradas[0].length; j++) {
                 //Actualizar pesos
-                Pesos[neurona_ganadora][j]+=(1/t)*(Entradas[i][j]-Pesos[neurona_ganadora][j]);
+                pesos[neurona_ganadora][j]+=(1/t)*(entradas[i][j]-pesos[neurona_ganadora][j]);
             }
                 
+            //IMPRESION EN CONSOLA DE LOS PESOS FINALES
+            /*
                 if(i==4)
                     switch(tt)
                 {
@@ -88,11 +76,49 @@ public class Kohonen {
                     
                     break;
                 }
+            */
         }
         
         t++;
         }
     }
-   
+    public int[] Inferencia(double[] Patron)
+    {
+        //Calculamos la distancia entre el Patron de Entrada
+        //y cada vector en los Pesos
+        //Aquel que tenga la menor distancia sera el valor 
+        //de la clase a la que pertence
+        double[] distancias = new double[entradas.length];
+        for (int i = 0; i < entradas.length; i++) {
+            for (int j = 0; j < pesos[i].length; j++) {
+                distancias[i] += Math.pow(Patron[j]-pesos[i][j],2);
+            }
+        }
+        /* En esta seccion se localizan MULTIPLES NEURONAS GANADORAS 
+           recuperamos el (los) valor(es) mas pequeño(s) de las distancias */
+        double aux=-1;
+        int[] neuronas = new int[distancias.length];
+        int con=0;
+        for (int i = 0; i < distancias.length; i++) {
+            if(i==0){
+                aux = distancias[i];
+                neuronas[0]=i+1;
+                con=1;
+            }
+            else if(distancias[i]<=aux){
+                if(distancias[i]<aux){
+                    aux = distancias[i];
+                    for (int j = 0; j < neuronas.length; j++) {
+                        neuronas[j]=0;
+                    }
+                    neuronas[0]=i+1;
+                    con=1;
+                }else if(distancias[i]==aux){
+                    neuronas[con] = i+1;
+                    con++;
+                }
+            }
+        }
+        return neuronas;
+    }
 }
-
