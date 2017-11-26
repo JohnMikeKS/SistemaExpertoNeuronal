@@ -17,13 +17,10 @@ import java.util.StringTokenizer;
  * @author joses
  */
 public class ManejoArchivos {
-    
-    
+
     //ArraysList necesarios para las reglas
-    ArrayList<ArrayList<String>> antecedentes = new ArrayList<>();
+    ArrayList<ArrayList<String>> antecedentes = new ArrayList();
     ArrayList consecuentes = new ArrayList();
-    
-    
     //Metodo para limpiar los array
     public void limpiar(){
      antecedentes.clear();
@@ -48,7 +45,7 @@ public class ManejoArchivos {
     
     public ArrayList<ArrayList<String>> recuperaAntecesores(String path){
         String contenido;
-        ArrayList antecesoresAuxiliar;
+        ArrayList<String> antecesoresAuxiliar;
         
         try {
             RandomAccessFile file = new RandomAccessFile(new File(path),"r");
@@ -76,13 +73,12 @@ public class ManejoArchivos {
     
     public ArrayList<String> recuperaSucesores(String path){
         String contenido;
-        ArrayList antecesoresAuxiliar;
+        ArrayList<String> antecesoresAuxiliar;
         
         try {
             RandomAccessFile file = new RandomAccessFile(new File(path),"r");
             while(file.getFilePointer() != file.length()){
-                antecesoresAuxiliar = new ArrayList();
-                antecesoresAuxiliar.clear();
+                
                 contenido = file.readUTF();
                
                 //Separadaor de antecedentes ^
@@ -93,10 +89,9 @@ public class ManejoArchivos {
 	            StringTokenizer st2 = new StringTokenizer(sucesores, "^");
 	            while(st2.hasMoreElements()) {
 					String ante = st2.nextToken();
-                       
-					antecesoresAuxiliar.add(ante);
+                                        
 				}
-                antecedentes.add(antecesoresAuxiliar);
+                
                 sucesores = st.nextToken();
 			  consecuentes.add(sucesores);
             }
