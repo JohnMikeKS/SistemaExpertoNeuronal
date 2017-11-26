@@ -19,7 +19,6 @@ import java.util.StringTokenizer;
 public class ManejoArchivos {
     
     
-    
     //ArraysList necesarios para las reglas
     ArrayList<ArrayList<String>> antecedentes = new ArrayList<>();
     ArrayList consecuentes = new ArrayList();
