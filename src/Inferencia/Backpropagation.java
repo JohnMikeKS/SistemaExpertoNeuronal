@@ -8,7 +8,18 @@ public class Backpropagation {
     ArrayList reglas;
     ArrayList consecuentes;
     int noAntecedentes,noReglas,noConsecuentes;
-    
+    public double errorSalida[] = new double[5] ;
+        public double pesos[];//Pesos 
+        public double thetas[];//Theta
+        double sigmoidalM[];//Sigmoidal
+        double sigmoidalF[];//Sigmoidal
+        double deltaUmbral[];//Delta Umbrales
+        double deltaReglas[];//Error Gradiante
+        double deltaPesos[];//Delta Pesos
+        final double alpha = 0.9; //Coeficiente de aprendizaje
+        final double betha = 1; //Betha Momento
+        int epoca=1;
+        double semilla=5;
     public void setAntecedentes(ArrayList n){
         this.antecedentes = n ;
         noAntecedentes = n.size();
@@ -20,197 +31,124 @@ public class Backpropagation {
     public void setConsecuentes(ArrayList x){
         this.consecuentes = x;
         noConsecuentes = x.size();
+        //asbdjkashdjkh
     }
     public  double random(){
-        semilla = ((81*semilla)+89)%100/100;
+        semilla = ((81*semilla)+89)%100/10;
         return semilla;
     }
-    
+    public double Sigmoidal(double ex){
+        return (1.0/(1 + Math.pow(Math.E, (-1) * ex)));
+    }
     public void iniciaPesos()
     {
-        pesos = new double[50];
-        deltaPesos = new double[50];
-        for (int i = 0; i < 50; i++) 
-        {
-            pesos[i]= random();
-            //pesos[i] = Math.random();
+        
+        pesos = new double[(noAntecedentes*noReglas)+(noReglas*noConsecuentes)];
+        deltaPesos = new double[pesos.length];
+        
+        for (int i = 0; i < pesos.length; i++){
+            pesos[i] = Math.random();
         }
+                
     }
     public void iniciaThetas()
     {
-        thetas = new double[10];
-        deltaUmbral = new double[10];
-        for (int i = 0; i < 10; i++) 
+        thetas = new double[noConsecuentes+noReglas];
+        deltaUmbral = new double[thetas.length];
+        for (int i = 0; i < thetas.length; i++) 
         {
-            thetas[i]= random();
-            //thetas[i]= Math.random();
+            //thetas[i]= random();
+            thetas[i]= Math.random();
         }
+        
     }
     public void inicia()
     {
-        sigmoidalM = new double[5];
-        sigmoidalF = new double[5];
-        error = new double[5];
-        deltaGradiante = new double[50];
+        sigmoidalM = new double[noReglas];
+        sigmoidalF = new double[noConsecuentes];
+        errorSalida = new double[noConsecuentes];
+        deltaReglas = new double[noReglas+noConsecuentes];
     }
-
-
     public void calSalidas(int entradas[], int salEsperada[])
     {
-        //entradas[] deben ser 5
-        //salEsperada[] deben ser 5
-        double sumaM[]= new double[5];
+        //Calculo de X para cada Neurona en la capa oculta
+        double X[]= new double[noReglas];
         int con=0;
-        for (int i = 0; i < 5; i++) 
-        {
-            for (int j = 0; j < 5; j++) {
-                sumaM[i] += entradas[j] * pesos[i*5];
-
-            }
-            con++;
+        for (int i = 0; i < noReglas; i++){
+            for (int j = 0; j < noAntecedentes; j++) 
+                X[i] += entradas[j] * pesos[noReglas*j+i];
+            X[i] = X[i]-thetas[i];
         }
+        //Calculo de la salida REAL de la capa Oculta
+        for (int i = 0; i < noReglas; i++) 
+            sigmoidalM[i] = Sigmoidal(X[i]);
 
-        for (int i = 0; i < 5; i++) 
-            sigmoidalM[i] = Sigmoidal(sumaM[i]-thetas[i]);
-
-        double sumaF=0;
-        for (int i = 0; i < 5; i++)
-            for (int j = 0; j < 5; j++)
-                sumaF += sigmoidalM[i]*pesos[25+i];
-
-        for (int i = 0; i < 5; i++) 
-            sigmoidalF[i] = Sigmoidal(sumaF-thetas[5+i]);
-
-        for (int i = 0; i < 5; i++) 
-            error[i] = salEsperada[i] - sigmoidalF[i];
-
+        //Calculo de Y para cada neurona en la capa de Salida
+        double[] Y=  new double[noConsecuentes];
+        for (int i = 0; i < noConsecuentes; i++){
+            for (int j = 0; j < noReglas; j++)
+            {
+                Y[i] += sigmoidalM[j]*pesos[(noAntecedentes*noReglas)+(noConsecuentes*j+i)];
+            }
+        Y[i] = Y[i]-thetas[noReglas+i];
+        }
+            
+        //Calculo de la salida REAL de la capa oculta
+        for (int i = 0; i < noConsecuentes; i++) 
+        {
+            sigmoidalF[i] = Sigmoidal(Y[i]);
+            errorSalida[i] = salEsperada[i] - sigmoidalF[i];
+        }
         Entrenamiento(entradas);
     }
 
     public void Entrenamiento(int entradas[])
     {
 
+       
         //CALCULO DE ERROR  Y DELTAS EN LA CAPA DE SALIDA 
-        for (int i = 0; i < 5; i++)
-            deltaGradiante[5+i] = sigmoidalF[i] * ( 1 - sigmoidalF[i])*error[i];
+        for (int i = 0; i < noConsecuentes; i++)
+            deltaReglas[noReglas+i] = sigmoidalF[i] * ( 1 - sigmoidalF[i])*errorSalida[i];
 
-            int con = 0;
-            for (int i = 0; i < 5; i++) 
-                for (int j = 0; j < 5; j++) 
-                {
-                    deltaPesos[25+con] = alpha * sigmoidalF[i] * deltaGradiante[j];
-                    con++;
-                }
-            con=0;
-
-            for (int i = 0; i < 5; i++) 
-                deltaUmbral[5+i] = alpha * (-1) * deltaGradiante[i];
-
-        //CALCULO DE ERROR GRADIANTE Y DELTAS EN LA CAPA OCULTA
-        double aux=0;
-
-
-            for (int i = 0; i < 5; i++)
+        //CALCULO DE DELTAS PESOS ENTRE LA CAPA DE SALIDA Y LA CAPA OCULTA (REGLAS)
+        for (int i = 0; i < noReglas; i++) 
+            for (int j = 0; j < noConsecuentes; j++)
             {
-                for (int j = 0; j < 5; j++)
-                {
-                    aux += deltaGradiante[j]*pesos[con];
-                    con++;
-                }
-                    deltaGradiante[i] = sigmoidalM[i] *(1 - sigmoidalM[i]) * aux;
-
+                //SIN MOMENTO
+                //deltaPesos[(noAntecedentes*noReglas)+i] = alpha * sigmoidalM[i] * deltaReglas[noReglas+j];
+                //CON MOMENTO
+                deltaPesos[(noAntecedentes*noReglas)+i] = alpha * sigmoidalM[i] * deltaReglas[noReglas+j] + (betha*deltaPesos[(noAntecedentes*noReglas)+i]);
+             
             }
-            con=0;
-        /*  
-        deltaK1 = H1Sigmoidal * (1 - H1Sigmoidal) * deltaJ2 * Wh1s1;
-        deltaJ1 = H2Sigmoidal * (1 - H2Sigmoidal) * deltaJ2 * Wh2s1;
-        */
-        for (int i = 0; i < 5; i++) 
-            for (int j = 0; j < 5; j++)
-            {
-                deltaPesos[con] = alpha * entradas[i] * deltaGradiante[i];
+        for (int i = 0; i < noConsecuentes; i++) 
+            deltaUmbral[noReglas+i] = alpha * (-1) * deltaReglas[noReglas+i];
+
+        //CALCULO DE ERROR GRADIANTE EN LA CAPA OCULTA (REGLAS)
+        double aux=0;
+        for (int i = 0; i < noReglas; i++){
+            for (int j = 0; j < noConsecuentes; j++)
+                aux += deltaReglas[noReglas+j]*pesos[(noAntecedentes*noReglas)+(noConsecuentes*j+i)];
+            deltaReglas[i] = sigmoidalM[i] *(1 - sigmoidalM[i]) * aux;
+        }
+       //Calculo de Delta Pesos entre Entrada y Oculta
+        int con=0;
+        for (int i = 0; i < noAntecedentes; i++) 
+            for (int j = 0; j < noReglas; j++){
+                //SIN MOMENTO
+                //deltaPesos[con] = alpha * entradas[i] * deltaReglas[j];
+                //CON MOMENTO
+                deltaPesos[con] = alpha * entradas[i] * deltaReglas[j] + (betha*deltaPesos[con]);
                 con++;
             }
+        //Calculo de Delta Umbrales para la capa Oculta (Reglas)
+        for (int i = 0; i < noReglas; i++)
+            deltaUmbral[i] = alpha * (-1) * deltaReglas[i]; 
 
-        for (int i = 0; i < 5; i++) 
-            {
-                deltaUmbral[i] = alpha * (-1) * deltaGradiante[i]; 
-
-            }
-        /*
-        dtH1 = alpha * (-1) * deltaK1;
-        dtH2 = alpha * (-1) * deltaJ1;
-        */
-
-        for (int i = 0; i < 50; i++) 
-        {
+        //Actualizacion de Pesos y Umbrales 
+        for (int i = 0; i < pesos.length; i++) 
             pesos[i] = pesos[i]+deltaPesos[i];
-        }
-        for (int i = 0; i < 10; i++) 
-        {
+        
+        for (int i = 0; i < thetas.length; i++) 
             thetas[i]= thetas[i]+deltaUmbral[i];
-        }
-
     }
-    /*
-    static void calSalidasMo(int x1, int x2, int gd5)
-    {
-        H1Sigmoidal = Sigmoidal(x1*Wx1h1 + x2*Wx2h1 - thetaH1);
-        H2Sigmoidal = Sigmoidal(x1*Wx1h2 + x2*Wx2h2 - thetaH2);
-        S1Sigmoidal = Sigmoidal(H1Sigmoidal*Wh1s1 + H2Sigmoidal*Wh2s1 - thetaS1);
-        error = gd5 - S1Sigmoidal;
-        EnMomentos(x1, x2);
-    }
-
-    static void EnMomentos(int x1, int x2)
-    {
-        deltaJ2 = S1Sigmoidal * (1 - S1Sigmoidal) * error;
-
-        dWh1s1 = alpha * H1Sigmoidal * deltaJ2 + ( betha * dWh1s1 );
-        dWh2s1 = alpha * H2Sigmoidal * deltaJ2 + ( betha * dWh2s1 );
-        dtS1 = alpha * (-1) * deltaJ2;
-
-
-        deltaK1 = H1Sigmoidal * (1 - H1Sigmoidal) * deltaJ2 * Wh1s1;
-        deltaJ1 = H2Sigmoidal * (1 - H2Sigmoidal) * deltaJ2 * Wh2s1;
-
-        dWx1h1 = alpha * x1 * deltaK1 + ( betha * dWx1h1 );
-        dWx2h1 = alpha * x2 * deltaK1 + ( betha * dWx2h1 );
-        dtH1 = alpha * (-1) * deltaK1;
-
-        dWx1h2 = alpha * x1 * deltaJ1 + ( betha * dWx1h2 );
-        dWx2h2 = alpha * x2 * deltaJ1 + ( betha * dWx2h2 );
-        dtH2 = alpha * (-1) * deltaJ1;
-
-        Wx1h1 = Wx1h1 + dWx1h1;
-        Wx1h2 = Wx1h2 + dWx1h2;
-        Wx2h1 = Wx2h1 + dWx2h1;
-        Wx2h2 = Wx2h2 + dWx2h2;
-        Wh1s1 = Wh1s1 + dWh1s1;
-        Wh2s1 = Wh2s1 + dWh2s1;
-
-        thetaH1 = thetaH1 + dtH1;
-        thetaH2 = thetaH2 + dtH2;
-        thetaS1 = thetaS1 + dtS1;
-    }
-    */
-    public double Sigmoidal(double ex)
-    {
-        return (1.0/(1 + Math.pow(Math.E, (-1) * ex)));
-    }
-        public double error[] = new double[5] ;
-        double pesos[];//Pesos 
-        double thetas[];//Theta
-        double sigmoidalM[];//Sigmoidal
-        double sigmoidalF[];//Sigmoidal
-        double deltaUmbral[];//Delta Umbrales
-        double deltaGradiante[];//Error Gradiante
-        double deltaPesos[];//Delta Pesos
-
-        final double alpha = 0.1; //Coeficiente de aprendizaje
-        final double betha = 1; //Betha Momento
-
-        int epoca=1;
-        double semilla=5;
-
-    }
+}
