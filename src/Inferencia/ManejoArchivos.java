@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+import javax.swing.JOptionPane;
 
 
 /**
@@ -25,6 +26,44 @@ public class ManejoArchivos {
     public void limpiar(){
      antecedentes.clear();
      consecuentes.clear();
+    }
+    
+    //Beto was here
+    public ArrayList<String> recuperarReglas(String path)
+    {
+        ArrayList <String> array = new ArrayList();
+        try
+        {
+            RandomAccessFile file = new RandomAccessFile(new File(path),"r");
+            while(file.getFilePointer() != file.length()){
+            array.add(file.readUTF());
+            }
+        }
+        catch(Exception e)
+        {
+            JOptionPane.showMessageDialog(null, "Trono el archivo");
+        }
+        return array;
+    }
+    
+    //And here too 
+    public void sobreescribir(String path,String reglas)
+    {
+        try
+        {
+            ArrayList <String> array=new ArrayList();
+            StringTokenizer st=new StringTokenizer(reglas,"\n");
+            while(st.hasMoreElements())
+                crearArchivoReglas(path,st.nextToken());
+                //System.out.println(st.nextToken());
+            
+            
+        }
+        catch(Exception e)
+        {
+            JOptionPane.showMessageDialog(null, "Trono el archivo");
+        }
+        
     }
     
     public void crearArchivoReglas(String path,String reglas){
