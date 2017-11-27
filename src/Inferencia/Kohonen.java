@@ -2,6 +2,7 @@ package Inferencia;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 public class Kohonen {
     
@@ -16,13 +17,19 @@ public class Kohonen {
     ArrayList<String> chido = new ArrayList<>();
     Object[] antecesoresC;
     HashMap<String,String> antecesor = new HashMap();
-   
+    HashMap<Integer,String> Mapeo;
+    double semilla=5;
+    Random  rnd = new Random();
+    public  double random(){
+        semilla = ((81*semilla)+89)%100/100;
+        return semilla;
+    }
     public void Entrenamiento()
     {
     
     int neurona_ganadora=0;
     double aux_neurona;
-        for (int tt = 1;tt <= 50000; tt++) 
+        for (int tt = 1;tt <= 500000; tt++) 
         {
            
         aux_neurona=-1;
@@ -76,8 +83,6 @@ public class Kohonen {
                             System.out.print(peso[j]+"\t");
                         System.out.println("");
                     }
-                        
-                    
                     break;
                 }
             */
@@ -88,10 +93,9 @@ public class Kohonen {
     }
     public int[] Inferencia(double[] Patron)
     {
-        //Calculamos la distancia entre el Patron de Entrada
-        //y cada vector en los Pesos
-        //Aquel que tenga la menor distancia sera el valor 
-        //de la clase a la que pertence
+        /*  Calculamos la distancia entre el Patron de Entrada
+            y cada vector en los Pesos aquel que tenga la menor 
+            distancia sera el valor de la clase a la que pertence */
         double[] distancias = new double[entradas.length];
         for (int i = 0; i < entradas.length; i++) {
             for (int j = 0; j < pesos[i].length; j++) {
@@ -127,8 +131,10 @@ public class Kohonen {
     }
     public Kohonen()
     {
+        rnd.setSeed(99723);
         antecesores = mA.recuperaAntecesores("reglas.dat");
         sucesores = mA.recuperaSucesores("reglas.dat");
+        sucesores.add("Ninguno");
         
         /*  Recuperar todos los antecesores que se emplearon en las reglas 
             para definir las reglas en patrones de entrada */
@@ -153,7 +159,7 @@ public class Kohonen {
         pesos= new double[entradas.length][entradas[0].length];
         for (int i = 0; i < pesos.length; i++) {
             for (int j = 0; j < pesos[0].length; j++) {
-                pesos[i][j]=Math.random();
+                pesos[i][j]=rnd.nextDouble();
             }
         }
         clases = entradas.length;
@@ -165,13 +171,11 @@ public class Kohonen {
             **Debido a que la Red crea diferentes clases para cada 
             **patron que se le entrego, es necesario comprobar a
             **que clase esta perteneciendo nuestras reglas.*/
-        HashMap<Integer,String> Mapeo = new HashMap();
+        Mapeo = new HashMap();
         /*  Se debe tener otro array donde esten indexados los consecuentes. */
         int i=0;
-        int[] idDeporte;
-        
-        for(double[] regla: entradas)
-        {
+        int[] idDeporte = new int[sucesores.size()];
+        for(double[] regla: entradas){
             idDeporte = Inferencia(regla);
             Mapeo.put(idDeporte[0],sucesores.get(i)); 
             i++;

@@ -20,10 +20,10 @@ public class pruebaArchivos {
         obj.limpiar();
         obj.elminarArchivoReglas("reglas.dat");
         // obj.crearArchivoReglas("reglas.dat", "h^j>r");
-        obj.crearArchivoReglas("reglas.dat", "pelota^campo^portero>futbol");
+        obj.crearArchivoReglas("reglas.dat", "pelota^campo^portero>Futbol");
         obj.crearArchivoReglas("reglas.dat", "pelota^canasta>Basquetbol");
         obj.crearArchivoReglas("reglas.dat", "pelota^campo^equipo>Americano");
-        obj.crearArchivoReglas("reglas.dat", "equipo^guantes>Boxeo");
+        obj.crearArchivoReglas("reglas.dat", "equipo^guantes^calificacion>Boxeo");
         obj.crearArchivoReglas("reglas.dat", "equipo^portero^hielo>Hokey");
         
         ArrayList<ArrayList<String>> antecesores = obj.recuperaAntecesores("reglas.dat");
@@ -34,7 +34,7 @@ public class pruebaArchivos {
         HashMap<String,String> antecesor = new HashMap();
         
         
-        for(int i = 0;i<antecesores.size()/2;i++)
+        for(int i = 0;i<antecesores.size();i++)
             for(int j=0;j<antecesores.get(i).size();j++){
                antecesor.put(antecesores.get(i).get(j),antecesores.get(i).get(j));
                 //chido.add(antecesores.get(i).get(j));
