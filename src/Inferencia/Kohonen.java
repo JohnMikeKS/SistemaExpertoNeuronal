@@ -12,14 +12,20 @@ public class Kohonen {
     double[] deltas; 
     int clases;
     ManejoArchivos mA = new ManejoArchivos();
-    ArrayList<ArrayList<String>> antecesores;
-    ArrayList<String> sucesores;
+    public ArrayList<ArrayList<String>> antecesores;
+    public ArrayList<String> sucesores;
     ArrayList<String> chido = new ArrayList<>();
-    Object[] antecesoresC;
+    public Object[] antecesoresC;
     HashMap<String,String> antecesor = new HashMap();
-    HashMap<Integer,String> Mapeo;
+    public HashMap<Integer,String> Mapeo;
+    public HashMap<Integer,String> MapeoA;
     double semilla=5;
     Random  rnd = new Random();
+    
+    public ArrayList<ArrayList<String>> recuperaAntecesores(){
+        return  antecesores;
+    }
+    
     public  double random(){
         semilla = ((81*semilla)+89)%100/100;
         return semilla;
@@ -172,13 +178,27 @@ public class Kohonen {
             **patron que se le entrego, es necesario comprobar a
             **que clase esta perteneciendo nuestras reglas.*/
         Mapeo = new HashMap();
+        MapeoA = new HashMap();
         /*  Se debe tener otro array donde esten indexados los consecuentes. */
+        ArrayList<String> ninguno= new ArrayList();
+        
+        antecesores.add(ninguno);
         int i=0;
         int[] idDeporte = new int[sucesores.size()];
         for(double[] regla: entradas){
             idDeporte = Inferencia(regla);
-            Mapeo.put(idDeporte[0],sucesores.get(i)); 
+            Mapeo.put(idDeporte[0],sucesores.get(i));
+            String reg=" ";
+            for (int j = 0; j < antecesores.get(i).size(); j++) {
+                reg+=antecesores.get(i).get(j)+"^";
+            }
+            reg=reg.substring(0,reg.length()-1);
+            MapeoA.put(idDeporte[0],reg);
+            
             i++;
-        } 
+        }
+        for (int j = 1; j < MapeoA.size()+1; j++) {
+            System.out.println(MapeoA.get(j));
+        }
     }
 }

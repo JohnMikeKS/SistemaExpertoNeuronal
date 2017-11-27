@@ -66,6 +66,11 @@ public class ManejoArchivos {
         
     }
     
+    public boolean existeArchivo(String path)
+    {
+        File f = new File(path);
+        return f.exists();
+    }
     public void crearArchivoReglas(String path,String reglas){
         try {
             RandomAccessFile file = new RandomAccessFile(path,"rw");
@@ -77,9 +82,11 @@ public class ManejoArchivos {
         }
     }
     
-    public boolean elminarArchivoReglas(String path){
+    public void elminarArchivoReglas(String path){
+           
         File f = new File(path);
-    	   return f.delete();
+        if(f.exists())
+    	   f.delete();
     }
     
     public ArrayList<ArrayList<String>> recuperaAntecesores(String path){

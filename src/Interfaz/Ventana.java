@@ -5,6 +5,7 @@
  */
 package Interfaz;
 
+import Inferencia.Kohonen;
 import Inferencia.ManejoArchivos;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,14 +17,19 @@ import javax.swing.JOptionPane;
  */
 public class Ventana extends javax.swing.JFrame {
 
+    Kohonen k;
     /**
      * Creates new form Ventana
      */
     
-    ManejoArchivos archivo=new ManejoArchivos();
+    ManejoArchivos archivo;
     
     public Ventana() {
         initComponents();
+        archivo = new ManejoArchivos();
+        if(archivo.existeArchivo("reglas.dat"))
+            k = new Kohonen();
+        
     }
 
     /**
@@ -43,7 +49,14 @@ public class Ventana extends javax.swing.JFrame {
         btnUpdateRegla = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
         btnRecuperaReglas = new javax.swing.JButton();
+        btnEntrenamiento = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        areaEntrenamiento = new javax.swing.JTextArea();
         jPanel2 = new javax.swing.JPanel();
+        btnInferencia = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        areraInferencia = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -90,7 +103,7 @@ public class Ventana extends javax.swing.JFrame {
                     .addComponent(btnDelete)
                     .addComponent(btnRecuperaReglas))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 697, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -105,20 +118,79 @@ public class Ventana extends javax.swing.JFrame {
                 .addComponent(btnDelete)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnRecuperaReglas)
-                .addContainerGap(108, Short.MAX_VALUE))
+                .addContainerGap(266, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("CRUD", jPanel1);
+
+        jButton1.setText("Entrenar");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        areaEntrenamiento.setColumns(20);
+        areaEntrenamiento.setRows(5);
+        jScrollPane2.setViewportView(areaEntrenamiento);
+
+        javax.swing.GroupLayout btnEntrenamientoLayout = new javax.swing.GroupLayout(btnEntrenamiento);
+        btnEntrenamiento.setLayout(btnEntrenamientoLayout);
+        btnEntrenamientoLayout.setHorizontalGroup(
+            btnEntrenamientoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnEntrenamientoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(btnEntrenamientoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 801, Short.MAX_VALUE)
+                    .addGroup(btnEntrenamientoLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(23, 23, 23))
+        );
+        btnEntrenamientoLayout.setVerticalGroup(
+            btnEntrenamientoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(btnEntrenamientoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 331, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jTabbedPane1.addTab("Entrenamiento", btnEntrenamiento);
+
+        btnInferencia.setText("Iniciar");
+        btnInferencia.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnInferenciaActionPerformed(evt);
+            }
+        });
+
+        areraInferencia.setColumns(20);
+        areraInferencia.setRows(5);
+        jScrollPane3.setViewportView(areraInferencia);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 470, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 814, Short.MAX_VALUE)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(btnInferencia)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 248, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(23, 23, 23)
+                .addComponent(btnInferencia)
+                .addGap(26, 26, 26)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         jTabbedPane1.addTab("Inferencia", jPanel2);
@@ -176,9 +248,82 @@ public class Ventana extends javax.swing.JFrame {
     }//GEN-LAST:event_btnRecuperaReglasActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+     
         archivo.elminarArchivoReglas("reglas.dat");
         JOptionPane.showMessageDialog(null, "Archivo eliminado");
     }//GEN-LAST:event_btnDeleteActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+       String pesos = "PESOS INICIALES\n";
+       
+        for (double [] peso : k.pesos){
+            for (int j = 0; j < peso.length; j++) 
+                pesos = pesos + String.format("%.2f",peso[j])+"\t";
+            pesos = pesos+"\n";
+            
+        }
+      
+        k.Entrenamiento(); //Entrenar la red
+        k.sincronizacion();
+        
+        pesos = pesos + "PESOS ENTRENADOS\n";
+        for (double [] peso : k.pesos){
+            for (int j = 0; j < peso.length; j++) 
+                pesos = pesos + String.format("%.2f",peso[j])+"\t";
+            pesos = pesos+"\n";
+            
+        }
+        areaEntrenamiento.setText(pesos);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void btnInferenciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInferenciaActionPerformed
+       String resultadoInferencia = "JUSTIFICACIÓN Y RESULTADO\n";
+        double [] patron = new double[k.antecesoresC.length];
+        int [] patronRespuesta = new int[k.antecesoresC.length];
+        int contador = 0;
+        for(Object resultado : k.antecesoresC){
+            String mensaje = "¿El objeto tiene " + resultado.toString() + "?";
+            String titulo = "Infiriendo";
+           int respuesta = JOptionPane.showConfirmDialog(null,mensaje,titulo,JOptionPane.YES_NO_OPTION);
+           if(respuesta == JOptionPane.YES_OPTION){
+               patron[contador] = 1.0;
+           }
+           contador++;
+               
+         }
+               
+        
+        patronRespuesta = k.Inferencia(patron);
+        resultadoInferencia = resultadoInferencia + "Reglas utilizadas: \n";
+        
+        if(!k.Mapeo.get(patronRespuesta[0]).equals("Ninguno"))
+        for(int i=0;i<patronRespuesta.length;i++){
+            if(patronRespuesta[i]!=0){
+                   resultadoInferencia = resultadoInferencia + k.MapeoA.get(patronRespuesta[i]);
+           //resultadoInferencia  = resultadoInferencia.substring(0,resultadoInferencia.length()-2);
+           resultadoInferencia = resultadoInferencia + " > " + k.Mapeo.get(patronRespuesta[i]);           
+           resultadoInferencia = resultadoInferencia + "\n";
+            }
+        }
+        
+        
+        resultadoInferencia = resultadoInferencia + " El resultado es: \n";
+        for(int i = 0;i<patronRespuesta.length;i++){
+            if(patronRespuesta[i]!=0)
+            {
+                System.out.println("Clase: "+patronRespuesta[i]);
+                if(k.Mapeo.get(patronRespuesta[i])==null)
+                    resultadoInferencia = resultadoInferencia + "No se ha encontrado una similitud";
+                else
+                     resultadoInferencia = resultadoInferencia +k.Mapeo.get(patronRespuesta[i]) + ", ";
+            }
+        }
+        
+        resultadoInferencia = resultadoInferencia.substring(0,resultadoInferencia.length()-1);
+        areraInferencia.setText(resultadoInferencia);
+        
+        
+    }//GEN-LAST:event_btnInferenciaActionPerformed
 
     /**
      * @param args the command line arguments
@@ -216,13 +361,20 @@ public class Ventana extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextArea areaEntrenamiento;
+    private javax.swing.JTextArea areraInferencia;
     private javax.swing.JButton btnDelete;
+    private javax.swing.JPanel btnEntrenamiento;
+    private javax.swing.JButton btnInferencia;
     private javax.swing.JButton btnInsertaReglas;
     private javax.swing.JButton btnRecuperaReglas;
     private javax.swing.JButton btnUpdateRegla;
+    private javax.swing.JButton jButton1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextArea txtArea;
     // End of variables declaration//GEN-END:variables
